@@ -20,19 +20,15 @@ import path from "path";
 const EasyYandexS3 = require("easy-yandex-s3").default;
 const main = async () => {
   dotenv.config();
-  // Create the schema, which will be used separately by ApolloServer and
-  // the WebSocket server.
+
   const schema = makeExecutableSchema({
     typeDefs,
     resolvers,
   });
 
-  // Create an Express app and HTTP server; we will attach both the WebSocket
-  // server and the ApolloServer to this HTTP server.
   const app = express();
   const httpServer = createServer(app);
 
-  // Create our WebSocket server using the HTTP server we just set up.
   const wsServer = new WebSocketServer({
     server: httpServer,
     path: "/graphql/subscriptions",
@@ -59,7 +55,6 @@ const main = async () => {
       const { session } = ctx.connectionParams;
       return { session, prisma, pubsub };
     }
-    // Otherwise let our resolvers know we don't have a current user
     return { session: null, prisma, pubsub };
   };
 
@@ -121,7 +116,6 @@ const main = async () => {
 
   const PORT = 4000;
 
-  // Now that our HTTP server is fully set up, we can listen to it.
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: PORT }, resolve)
   );
